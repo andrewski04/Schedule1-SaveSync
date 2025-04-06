@@ -465,6 +465,7 @@
 		<Compile Include="ContinueScreenPatch.cs" />
 		<Compile Include="Core.cs" />
 		<Compile Include="SyncSaveManager.cs" />
+		<Compile Include="Utils.cs" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

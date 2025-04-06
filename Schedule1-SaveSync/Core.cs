@@ -6,10 +6,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using Il2CppScheduleOne.Persistence;
 
-[assembly: MelonInfo(typeof(Schedule1_SaveSync.Core), "Schedule1-SaveSync", "1.0.0", "Andrew Houser", null)]
+[assembly: MelonInfo(typeof(ScheduleOne_SaveSync.Core), "ScheduleI-SaveSync", "1.0.0", "Andrew Houser", null)]
 [assembly: MelonGame("TVGS", "Schedule I")]
 
-namespace Schedule1_SaveSync
+namespace ScheduleOne_SaveSync
 {
     public class Core : MelonMod
     {
