@@ -13,7 +13,6 @@ using Il2CppTMPro;
 
 namespace ScheduleOne_SaveSync
 {
-
     internal class ContinueScreenPatch
     {
 
@@ -35,7 +34,7 @@ namespace ScheduleOne_SaveSync
                     return;
                 }
 
-                //DumpUIHierarchy(__instance.transform);
+                //Utils.DumpUIHierarchy(__instance.transform);
 
                 MelonLogger.Msg("Injecting synced save buttons from Update()");
                 InjectSyncedButtons(__instance);
@@ -64,9 +63,11 @@ namespace ScheduleOne_SaveSync
 
             int injected = 0;
 
-            foreach (var save in LoadManager.SaveGames)
+            foreach (SaveInfo save in LoadManager.SaveGames)
             {
-                if (save.SaveSlotNumber < 1000)
+                //MelonLogger.Msg(Il2CppNewtonsoft.Json.JsonConvert.SerializeObject(save));
+
+                if (save is null || save.SaveSlotNumber < 100)
                     continue;
 
                 try
@@ -74,7 +75,21 @@ namespace ScheduleOne_SaveSync
                     var newSlot = UnityEngine.Object.Instantiate(template.gameObject, container);
                     newSlot.name = $"SyncedSlot_{save.SaveSlotNumber}";
 
-                    newSlot.transform.Find("Index")?.GetComponent<Il2CppTMPro.TextMeshProUGUI>()?.SetText(save.SaveSlotNumber.ToString());
+                    // fix save slot number styling for sync save slots
+                    var indexText = newSlot.transform.Find("Index")?.GetComponent<Il2CppTMPro.TextMeshProUGUI>();
+                    if (indexText != null)
+                    {
+                        indexText.SetText(save.SaveSlotNumber.ToString());
+
+                        var rectTransform = indexText.rectTransform;
+                        rectTransform.sizeDelta = new Vector2(60f, rectTransform.sizeDelta.y);
+
+                        indexText.fontSize = 18f; 
+
+                        indexText.horizontalAlignment = HorizontalAlignmentOptions.Center;
+                        indexText.verticalAlignment = VerticalAlignmentOptions.Middle;
+                    }
+
 
                     var slotContainer = newSlot.transform.Find("Container");
                     if (slotContainer == null)

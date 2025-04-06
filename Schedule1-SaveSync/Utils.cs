@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using MelonLoader;
 using UnityEngine;
 
-namespace Schedule1_SaveSync
+namespace ScheduleOne_SaveSync
 {
-    internal class Utils
+    public class Utils
     {
         // util method to dump the UI hierarchy for debugging
         public static void DumpUIHierarchy(Transform root, int depth = 0)

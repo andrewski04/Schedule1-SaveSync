@@ -8,6 +8,7 @@ using UnityEngine;
 using Il2CppNewtonsoft;
 using Il2CppNewtonsoft.Json;
 using Il2CppNewtonsoft.Json.Linq;
+using MelonLoader;
 
 namespace ScheduleOne_SaveSync
 {
@@ -52,20 +53,28 @@ namespace ScheduleOne_SaveSync
             var original = LoadManager.SaveGames ?? Array.Empty<SaveInfo>();
             var allSaves = new List<SaveInfo>(original);
 
+            //foreach (var save in allSaves)
+            //{
+            //    MelonLogger.Msg(Il2CppNewtonsoft.Json.JsonConvert.SerializeObject(save));
+            //}
+
+            int injectedCount = 0;
             foreach (var folder in GetSyncedSaveFolders())
             {
+                // Check if this save path is already in the list
+                if (allSaves.Any(save => save != null && save.SavePath == folder))
+                    continue;
+
                 var info = CreateSaveInfoFromFolder(folder);
                 if (info != null)
+                {
                     allSaves.Add(info);
+                    injectedCount++;
+                }
             }
 
             LoadManager.SaveGames = allSaves.ToArray();
-
-            //foreach (var save in allSaves) {
-            //    MelonLoader.MelonLogger.Msg(Il2CppNewtonsoft.Json.JsonConvert.SerializeObject(save));
-            //}
-
-            MelonLoader.MelonLogger.Msg($"Injected {allSaves.Count - original.Length} synced saves.");
+            MelonLoader.MelonLogger.Msg($"Injected {injectedCount} synced saves.");
         }
 
         /// <summary>
@@ -77,10 +86,9 @@ namespace ScheduleOne_SaveSync
             if (!folderName.StartsWith(SyncPrefix))
                 return null;
 
-            // Attempt to extract the slot number
-            int slotNumber = 1000; // Default fallback
+            int slotNumber = 100; // Default fallback
             if (int.TryParse(folderName.Substring(SyncPrefix.Length), out int parsed))
-                slotNumber = parsed + 1000; // Keep synced slots separate from native slots
+                slotNumber = parsed + 100; // Keep synced slots separate from native slots
 
             // Default values in case we can't read the files
             string organisationName = "[SyncSave] Unknown";
