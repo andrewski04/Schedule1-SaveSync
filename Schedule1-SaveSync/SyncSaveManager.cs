@@ -9,6 +9,11 @@ using Il2CppNewtonsoft;
 using Il2CppNewtonsoft.Json;
 using Il2CppNewtonsoft.Json.Linq;
 using MelonLoader;
+using Harmony;
+using Il2CppFluffyUnderware.DevTools.Extensions;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
+using System.Runtime.CompilerServices;
+using Il2CppScheduleOne.UI.MainMenu;
 
 namespace ScheduleOne_SaveSync
 {
@@ -17,6 +22,8 @@ namespace ScheduleOne_SaveSync
     /// </summary>
     public static class SyncSaveManager
     {
+        public static Il2CppScheduleOne.UI.MainMenu.SaveDisplay latestSD;
+
         private const string SyncPrefix = "SyncSave_";
         private static readonly string GameSavesPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -50,6 +57,7 @@ namespace ScheduleOne_SaveSync
         /// </summary>
         public static void InjectIntoLoadManager()
         {
+            MelonLogger.Msg(LoadManager.SaveGames.Count);
             var original = LoadManager.SaveGames ?? Array.Empty<SaveInfo>();
             var allSaves = new List<SaveInfo>(original);
 
@@ -57,6 +65,14 @@ namespace ScheduleOne_SaveSync
             //{
             //    MelonLogger.Msg(Il2CppNewtonsoft.Json.JsonConvert.SerializeObject(save));
             //}
+
+            Il2CppReferenceArray<SaveInfo> newSi = new Il2CppReferenceArray<SaveInfo>(8);
+            for(int i =0; i<LoadManager.SaveGames.Count; i++)
+            {
+                newSi[i] = LoadManager.SaveGames[i];
+            }
+
+            LoadManager.SaveGames = newSi;
 
             int injectedCount = 0;
             foreach (var folder in GetSyncedSaveFolders())
@@ -68,13 +84,20 @@ namespace ScheduleOne_SaveSync
                 var info = CreateSaveInfoFromFolder(folder);
                 if (info != null)
                 {
-                    allSaves.Add(info);
+                    LoadManager.SaveGames[info.SaveSlotNumber] = (info);
+                    MelonLogger.Msg($"Injected {folder}, now: {LoadManager.SaveGames.Count}");
                     injectedCount++;
                 }
             }
 
-            LoadManager.SaveGames = allSaves.ToArray();
+            if (latestSD)
+            {
+                latestSD.Refresh();
+
+            }
+
             MelonLoader.MelonLogger.Msg($"Injected {injectedCount} synced saves.");
+            
         }
 
         /// <summary>
@@ -88,11 +111,11 @@ namespace ScheduleOne_SaveSync
 
             int slotNumber = 100; // Default fallback
             if (int.TryParse(folderName.Substring(SyncPrefix.Length), out int parsed))
-                slotNumber = parsed + 100; // Keep synced slots separate from native slots
+                slotNumber = parsed; // Keep synced slots separate from native slots
 
             // Default values in case we can't read the files
             string organisationName = "[SyncSave] Unknown";
-            float networth = 0f;
+            float networth = 69f;
             string saveVersion = "1.0";
             DateTime createdDateTime = DateTime.UtcNow;
             DateTime lastPlayedDateTime = DateTime.UtcNow;
@@ -104,6 +127,8 @@ namespace ScheduleOne_SaveSync
                 string metadataPath = Path.Combine(folderPath, "Metadata.json");
                 if (File.Exists(metadataPath))
                 {
+                    Il2CppSystem.DateTime? il2created = null;
+                    Il2CppSystem.DateTime? il2lastPlayed = null;
                     string metadataJson = File.ReadAllText(metadataPath);
                     metaData = Il2CppNewtonsoft.Json.JsonConvert.DeserializeObject<MetaData>(metadataJson);
 
@@ -121,6 +146,7 @@ namespace ScheduleOne_SaveSync
                         int second = (int)metaData.CreationDate.Second;
 
                         createdDateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc);
+                        il2created = new Il2CppSystem.DateTime(year, month, day, hour, minute, second, Il2CppSystem.DateTimeKind.Utc);
                     }
 
                     // Extract last played date
@@ -134,7 +160,10 @@ namespace ScheduleOne_SaveSync
                         int second = (int)metaData.LastPlayedDate.Second;
 
                         lastPlayedDateTime = new DateTime(year, month, day, hour, minute, second, DateTimeKind.Utc);
+                        il2lastPlayed = new Il2CppSystem.DateTime(year, month, day, hour, minute, second, Il2CppSystem.DateTimeKind.Utc);
+
                     }
+
                 }
                 else
                 {
@@ -162,7 +191,7 @@ namespace ScheduleOne_SaveSync
                     JObject gameData = Il2CppNewtonsoft.Json.JsonConvert.DeserializeObject<JObject>(gameJson);
 
                     // Extract organization name and prepend [SyncSave]
-                    string orgName = (string)gameData?.SelectToken("OrganisationName")  ?? "Unknown";
+                    string orgName = (string)gameData?.SelectToken("OrganisationName") ?? "Unknown";
                     organisationName = $"[SyncSave] {orgName}";
                 }
 
