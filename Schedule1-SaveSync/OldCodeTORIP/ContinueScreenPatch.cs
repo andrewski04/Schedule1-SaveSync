@@ -17,7 +17,7 @@ using System.Transactions;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using Il2CppFluffyUnderware.DevTools.Extensions;
 
-namespace Schedule1_SaveSync.Patches
+namespace Schedule1_SaveSync.OldCodeTORIP
 {
     internal class ContinueScreenPatch
     {

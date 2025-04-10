@@ -462,11 +462,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="Patches\ContinueScreenPatch.cs" />
+		<Compile Include="OldCodeTORIP\ContinueScreenPatch.cs" />
 		<Compile Include="Core.cs" />
-		<Compile Include="Patches\SyncSaveManager.cs" />
+		<Compile Include="OldCodeTORIP\SyncSaveManager.cs" />
+		<Compile Include="SaveSync\Interfaces\ISaveable.cs" />
+		<Compile Include="SaveSync\Interfaces\ISaveManager.cs" />
 		<Compile Include="SaveSync\UIManager.cs" />
 		<Compile Include="Utils.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Patches\" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

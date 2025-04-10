@@ -15,7 +15,7 @@ using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using System.Runtime.CompilerServices;
 using Il2CppScheduleOne.UI.MainMenu;
 
-namespace Schedule1_SaveSync.Patches
+namespace Schedule1_SaveSync.OldCodeTORIP
 {
     /// <summary>
     /// SyncSaveManager handles injecting SyncSave_1, SyncSave_2, etc. into the LoadManager.
