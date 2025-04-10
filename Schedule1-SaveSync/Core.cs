@@ -5,6 +5,7 @@ using Il2CppScheduleOne.UI.MainMenu;
 using UnityEngine;
 using System.Collections.Generic;
 using Il2CppScheduleOne.Persistence;
+using Schedule1_SaveSync.Patches;
 
 [assembly: MelonInfo(typeof(ScheduleOne_SaveSync.Core), "ScheduleI-SaveSync", "1.0.0", "Andrew Houser", null)]
 [assembly: MelonGame("TVGS", "Schedule I")]
